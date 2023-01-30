@@ -1,2 +1,13 @@
+.DS_Store
+
 # Ignore node modules folder
-.quicken-blank-canvas/node_modules
+quicken-blank-canvas/node_modules
+
+# Package Files #
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
