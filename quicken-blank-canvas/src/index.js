@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import styles from './styles.js';
 import TextField from '@mui/material/TextField';
@@ -24,6 +24,9 @@ const turtle = {
 };
 const moveArray = ['shiftLeft', 'shiftRight', 'shiftUp', 'shiftDown', 'shiftAngle'];
 
+// Setting global variable for turtle pointer change 
+let setTurtlePointer;
+
 function ReactRoot(){
     // Creating length variable to take input from the user to draw the line with the required length
     // https://mui.com/material-ui/react-text-field/#uncontrolled-vs-controlled
@@ -38,15 +41,21 @@ function ReactRoot(){
     const [y, setY] = useState(turtle.y);
     const [angle, setAngle] = useState(turtle.angle);
 
-    setInterval(() => {
+    // setInterval(() => {
+    //     setX(turtle.x);
+    //     setY(turtle.y);
+    //     setAngle(turtle.angle);
+    // }, 50);
+    // Setting the turtle pointer if and only the poistion changes
+    setTurtlePointer = function () {
+        console.log("inside setturtle");
         setX(turtle.x);
         setY(turtle.y);
         setAngle(turtle.angle);
-    }, 50);
-
+    };
 
     console.log('turtle X:', turtle.x, ' Y:', turtle.y, ' angle:', turtle.angle );
-    //Settinf the width and height based on the canvas size selection
+    //Setting the width and height based on the canvas size selection
     width = sizeEnum[size][0];
     height = sizeEnum[size][1];
     return (
@@ -63,7 +72,7 @@ function ReactRoot(){
                         {Object.keys(sizeEnum).map((key) =>
                             <button
                                 key={key}
-                                onClick={() => {setSize(key)}}
+                                onClick={() => {turtle.x = 360; turtle.y = 200; setSize(key)}} // Setting turtle pointer to default value if the canvas size is changed
                                 style={{
                                     ...styles.button,
                                     backgroundColor: key === size && '#C9C7C5',
@@ -128,6 +137,7 @@ function ReactRoot(){
                     </button>
                 </div>
 
+                {/* Input length field declaration using material UI - https://mui.com/material-ui/api/text-field/ */}
                 <div style={{ ...styles.spacer}}>
                     <TextField
                         id="line-length"
@@ -211,6 +221,7 @@ function handleUndo () {
     turtle.x = previous.x;
     turtle.y = previous.y;
     turtle.angle = previous.angle;
+    setTurtlePointer(); // Calling the function to set the turtle pointer
 }
 
 function handleRedo () {
@@ -222,6 +233,7 @@ function handleRedo () {
     turtle.x = next.x;
     turtle.y = next.y;
     turtle.angle = next.angle;
+    setTurtlePointer(); // Calling the function to set the turtle pointer
 }
 
 function handleDragEnd (turX, turY, turAngle) {
@@ -264,38 +276,42 @@ turtle.logPenStatus = function () {
 //Changes made to the conditions below to have the turtle pointer to be inside the canvas
 turtle.shiftLeft = function (length=50) {
     //console.log('turle = ' + turtle.x);
-    console.log('width = ' + width);
     if(turtle.x - length  > 0 && turtle.x + length < width && turtle.y - length > 0 && turtle.y + length < height)
         turtle.x -= length;
     else
         turtle.x = 360;
-    handleDragEnd(turtle.x, turtle.y, turtle.angle);
+    handleDragEnd(turtle.x, turtle.y, turtle.angle); // Calling function to save the state of the turtle pointer movement
+    setTurtlePointer(); // Calling the function to set the turtle pointer
 };
 turtle.shiftRight = function (length=50) {
     if(turtle.x + length < width && turtle.x - length  > 0 && turtle.y - length > 0 && turtle.y + length < height)
         turtle.x += length;
     else
         turtle.x = 360;
-    handleDragEnd(turtle.x, turtle.y, turtle.angle);
+    handleDragEnd(turtle.x, turtle.y, turtle.angle); // Calling function to save the state of the turtle pointer movement
+    setTurtlePointer(); // Calling the function to set the turtle pointer
 };
 turtle.shiftUp = function (length=50) {
     if(turtle.y - length > 0 && turtle.x - length  > 0 && turtle.x + length < width && turtle.y + length < height)
         turtle.y -= length;
     else
         turtle.y = 200;
-    handleDragEnd(turtle.x, turtle.y, turtle.angle);
+    handleDragEnd(turtle.x, turtle.y, turtle.angle); // Calling function to save the state of the turtle pointer movement
+    setTurtlePointer(); // Calling the function to set the turtle pointer
 };
 turtle.shiftDown = function (length=50) {
     if(turtle.y + length < height && turtle.x - length  > 0 && turtle.x + length < width && turtle.y - length > 0)
         turtle.y += length;
     else
         turtle.y = 200;
-    handleDragEnd(turtle.x, turtle.y, turtle.angle);
+    handleDragEnd(turtle.x, turtle.y, turtle.angle); // Calling function to save the state of the turtle pointer movement
+    setTurtlePointer(); // Calling the function to set the turtle pointer
 };
 // Creating function to turn the turtle pointer
 turtle.shiftAngle = function (angle=72) {
     turtle.angle += angle;
     handleDragEnd(turtle.x, turtle.y, turtle.angle);
+    setTurtlePointer(); // Calling the function to set the turtle pointer
 };
 
 
